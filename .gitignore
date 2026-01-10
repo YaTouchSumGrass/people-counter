@@ -1,0 +1,6 @@
+Api/.venv
+Api/.cache
+Api/.pio
+Api/compile_commands.json
+
+App/elm-stuff
