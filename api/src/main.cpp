@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <WiFi.h>
+#include "AsyncWebSocket.h"
 #include "Stats.hpp"
 #include "Sensors.hpp"
 #include "Server.hpp"
@@ -26,4 +28,5 @@ void loop() {
     bool pir = digitalRead(PIR_PIN);
     updatePIR(pir);
     updateIR(&globalStat, irA, irB);
+    cleanupClients();
 }

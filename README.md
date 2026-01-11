@@ -3,7 +3,7 @@ A school project to count the total amount of people who has entered or exited a
 
 ## How To Compile
 You'll need to install Python on your machine.
-Inside the Api directory, you'll need to create a Python virtual environment. Run:
+Inside the api directory, you'll need to create a Python virtual environment. Run:
 ```bash
 python3 -m venv .venv
 ```
@@ -33,5 +33,13 @@ To monitor, run:
 ```bash
 pio device monitor
 ```
+
+For the web view, you'll need the Gleam compiler to compile it.Check out https://gleam.run/getting-started/installing/ to see how you can install Gleam on your platform.
+
+Then in the app directory, you can build it by running:
+```bash
+gleam run -m lustre/dev build
+```
+Make sure to check the file gleam.toml as well.
 
 Checkout the source code as well, as they maybe things that you might want to adjust to fit your specifications.

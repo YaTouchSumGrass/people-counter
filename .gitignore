@@ -1,6 +1,11 @@
-Api/.venv
-Api/.cache
-Api/.pio
-Api/compile_commands.json
+api/.venv
+api/.cache
+api/.pio
+api/compile_commands.json
 
-App/elm-stuff
+*.beam
+*.ez
+app/build
+app/erl_crash.dump
+app/.lustre
+app/dist

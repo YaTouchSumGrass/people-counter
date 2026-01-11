@@ -1,4 +1,5 @@
 #include "Sensors.hpp"
+#include "Server.hpp"
 #include "HardwareSerial.h"
 #include <Arduino.h>
 
@@ -35,6 +36,7 @@ void updateIR(Stat* stat, bool irA, bool irB) {
         case IRState::IRATriggered: {
             if (irB && pirState.active) {
                 stat->entered++;
+                updateStats();
                 Serial.print("Entered: ");
                 Serial.println(stat->entered);
                 Serial.print("Exited: ");
@@ -49,6 +51,7 @@ void updateIR(Stat* stat, bool irA, bool irB) {
         case IRState::IRBTriggered: {
             if (irA && pirState.active) {
                 stat->exited++;
+                updateStats();
                 Serial.print("Entered: ");
                 Serial.println(stat->entered);
                 Serial.print("Exited: ");
