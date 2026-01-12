@@ -64,7 +64,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
       _ -> #(model, effect.none())
     }
-    Refresh -> #(model, ws.init("ws://172.22.45.54/ws", OnReceiveMessage))
+    Refresh -> #(model, ws.init("ws://192.168.4.1/ws", OnReceiveMessage))
   }
 }
 
