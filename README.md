@@ -36,9 +36,14 @@ pio device monitor
 
 For the web view, you'll need the Gleam compiler to compile it.Check out https://gleam.run/getting-started/installing/ to see how you can install Gleam on your platform.
 
-Then in the app and db directory, you can build it by running:
+Then in the app directory, you can build it by running:
 ```bash
 gleam run -m lustre/dev build
+```
+
+And for database backend, in the db directory, run:
+```bash
+gleam build
 ```
 
 Checkout the source code as well, as they maybe things that you might want to adjust to fit your specifications. Primarily these files:
