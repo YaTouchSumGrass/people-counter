@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include "AsyncWebSocket.h"
+#include <cstdint>
+#include "Esp.h"
 #include "Stats.hpp"
 #include "Sensors.hpp"
 #include "Server.hpp"
@@ -10,8 +11,9 @@ const int IRB_PIN = 33;
 const int PIR_PIN = 34;
 
 Stat globalStat = {
+    .boot_id = String((uint32_t)ESP.getEfuseMac(), 16) + "-" + String(millis()),
     .entered = 0,
-    .exited = 0
+    .exited = 0,
 };
 
 void setup() {

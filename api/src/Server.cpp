@@ -6,12 +6,36 @@
 
 void setupWiFi() {
     WiFi.mode(WIFI_AP);
-    WiFi.softAP("ESP32_DoorCounter", "Skibidi67TungTungSahur");
+    // You can change the WiFi name and password here!
+    WiFi.softAP("ESP32_PeopleCounter", "Skibidi67TungTungSahur");
 }
 
 extern Stat globalStat;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
+
+void updateStats() {
+    JsonDocument doc;
+    doc["boot_id"] = globalStat.boot_id;
+    doc["entered"] = globalStat.entered;
+    doc["exited"] = globalStat.exited;
+    
+    Serial.print("Entered: ");
+    Serial.println(globalStat.entered);
+    Serial.print("Exited: ");
+    Serial.println(globalStat.exited);
+
+    String json;
+    serializeJson(doc, json);
+    ws.textAll(json);
+}
+
+void archiveSession() {
+    Serial.println("Archive session message received.");
+    globalStat.entered = 0;
+    globalStat.exited = 0;
+    updateStats();
+}
 
 void onWSEvent(
     AsyncWebSocket* server,
@@ -23,32 +47,34 @@ void onWSEvent(
 ) {
     switch (type) {
         case WS_EVT_CONNECT:
-            Serial.println("WS client connected");
+            Serial.println("WebSocket client connected.");
             break;
 
         case WS_EVT_DISCONNECT:
-            Serial.println("WS client disconnected");
+            Serial.println("WebSocket client disconnected.");
             break;
 
         case WS_EVT_ERROR:
-            Serial.println("WS error");
+            Serial.println("WebSocket client error.");
             break;
 
-        case WS_EVT_DATA:
-            Serial.println("WS data received");
+        case WS_EVT_DATA: {
+            AwsFrameInfo* info = (AwsFrameInfo*)arg;
+            if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+                data[len] = 0;
+                String message = (char*)data;
+                if (message == "ARCHIVE") {
+                    archiveSession();
+                }
+                else {
+                    Serial.println("Invalid message received. Ignoring.");
+                }
+            }
             break;
+        }
     }
 }
 
-void updateStats() {
-    JsonDocument doc;
-    doc["entered"] = globalStat.entered;
-    doc["exited"] = globalStat.exited;
-
-    String json;
-    serializeJson(doc, json);
-    ws.textAll(json);
-}
 
 void setupServer() {
     setupWiFi();
@@ -60,6 +86,7 @@ void setupServer() {
 
     server.on("/api/stats", HTTP_GET, [](AsyncWebServerRequest* req) {
         JsonDocument doc;
+        doc["boot_id"] = globalStat.boot_id;
         doc["entered"] = globalStat.entered;
         doc["exited"] = globalStat.exited;
 
@@ -94,3 +121,4 @@ void setupServer() {
 void cleanupClients() {
     ws.cleanupClients();
 }
+

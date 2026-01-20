@@ -37,10 +37,6 @@ void updateIR(Stat* stat, bool irA, bool irB) {
             if (irB && pirState.active) {
                 stat->entered++;
                 updateStats();
-                Serial.print("Entered: ");
-                Serial.println(stat->entered);
-                Serial.print("Exited: ");
-                Serial.println(stat->exited);
                 irState = IRState::Idle;
             }
             else if (now - irStateTime > SEQ_TIMEOUT) {
@@ -52,10 +48,6 @@ void updateIR(Stat* stat, bool irA, bool irB) {
             if (irA && pirState.active) {
                 stat->exited++;
                 updateStats();
-                Serial.print("Entered: ");
-                Serial.println(stat->entered);
-                Serial.print("Exited: ");
-                Serial.println(stat->exited);
                 irState = IRState::Idle;
             }
             else if (now - irStateTime > SEQ_TIMEOUT) {

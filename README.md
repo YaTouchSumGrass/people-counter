@@ -3,7 +3,7 @@ A school project to count the total amount of people who has entered or exited a
 
 ## How To Compile
 You'll need to install Python on your machine.
-Inside the api directory, you'll need to create a Python virtual environment. Run:
+You'll need to create a Python virtual environment. Run:
 ```bash
 python3 -m venv .venv
 ```
@@ -24,7 +24,7 @@ pip install platformio
 
 Then in file platformio.ini, make sure to change the port there to your actual serial port.
 
-To compile and upload, run:
+To compile and upload, go inside the api directory and run:
 ```bash
 pio run -t upload
 ```
@@ -36,10 +36,13 @@ pio device monitor
 
 For the web view, you'll need the Gleam compiler to compile it.Check out https://gleam.run/getting-started/installing/ to see how you can install Gleam on your platform.
 
-Then in the app directory, you can build it by running:
+Then in the app and db directory, you can build it by running:
 ```bash
 gleam run -m lustre/dev build
 ```
-Make sure to check the file gleam.toml as well.
 
-Checkout the source code as well, as they maybe things that you might want to adjust to fit your specifications.
+Checkout the source code as well, as they maybe things that you might want to adjust to fit your specifications. Primarily these files:
+- app/gleam.toml
+- api/platformio.ini
+- api/src/Server.cpp
+- apt/src/Sensors.cpp

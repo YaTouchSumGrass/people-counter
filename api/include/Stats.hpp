@@ -1,6 +1,8 @@
 #pragma once
+#include "WString.h"
 
 struct Stat {
-    volatile int entered;
-    volatile int exited;
+    String boot_id;
+    int entered;
+    int exited;
 };

@@ -1,4 +1,4 @@
-api/.venv
+.venv
 api/.cache
 api/.pio
 api/compile_commands.json
@@ -9,3 +9,7 @@ app/build
 app/erl_crash.dump
 app/.lustre
 app/dist
+
+db/build
+db/erl_crash.dump
+db/sessions.db

@@ -1,5 +1,7 @@
 #pragma once
 
-void updateStats();
 void setupServer();
 void cleanupClients();
+
+void updateStats();
+void archiveSession();
