@@ -11,43 +11,15 @@ import lustre/element.{type Element}
 import gleam/option.{Some, None}
 import model.{type Model, type Msg, ArchiveSession}
 
+@external(javascript, "./localTime.mjs", "toLocalTime")
+fn to_local_time(rfc3339: String) -> String
+
 fn init(_) -> #(Model, Effect(Msg)) {
   websocket.connect_esp32()
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
-<<<<<<< HEAD
-  case msg {
-    OnReceiveMessage(event) -> case event {
-      ws.OnOpen(socket) -> #(Model(..model, socket: Some(socket)), effect.none())
-
-      ws.OnTextMessage(text) -> {
-        let decoder = {
-          use entered <- decode.field("entered", decode.int)
-          use exited <- decode.field("exited", decode.int)
-          decode.success(Stat(entered, exited))
-        }
-
-        let stat = case json.parse(text, decoder) {
-          Ok(t) -> Some(t)
-          Error(_) -> None
-        }
-
-        #(Model(..model, stat: stat), effect.none())
-      }
-
-      ws.InvalidUrl -> {
-        io.println("Invalid WebSocket URL!")
-        #(model, effect.none())
-      }
-
-      _ -> #(model, effect.none())
-    }
-    Refresh -> #(model, ws.init("ws://192.168.4.1/ws", OnReceiveMessage))
-  }
-=======
   websocket.sync_esp32(model, msg)
->>>>>>> 3fb9c33 (feat: databases + sessions + archiving)
 }
 
 fn view(model: Model) -> Element(Msg) {
@@ -85,8 +57,8 @@ fn view(model: Model) -> Element(Msg) {
           .. list.map(sessions, fn(session) {
             html.tr([], [
               html.td([], [html.text(int.to_string(session.uuid))]),
-              html.td([], [html.text(session.started)]),
-              html.td([], [html.text(session.ended)]),
+              html.td([], [html.text(to_local_time(session.started))]),
+              html.td([], [html.text(to_local_time(session.ended))]),
               html.td([], [html.text(int.to_string(session.entered))]),
               html.td([], [html.text(int.to_string(session.exited))])
             ])
