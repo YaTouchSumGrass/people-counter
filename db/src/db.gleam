@@ -6,6 +6,7 @@ import wisp/wisp_mist
 import wisp.{type Request, type Response}
 import sqlight.{type Connection}
 import session
+import sensor_event
 
 fn handle_request(request: Request, connection: Connection) -> Response {
   use <- wisp.log_request(request)
@@ -15,6 +16,7 @@ fn handle_request(request: Request, connection: Connection) -> Response {
 
   case wisp.path_segments(request) {
     ["sessions"] -> session.handle_sessions(request, connection)
+    ["events"] -> sensor_event.handle_events(request, connection)
     _ -> wisp.not_found()
   }
 }
@@ -32,7 +34,7 @@ pub fn main() {
   wisp.configure_logger()
   let secret_key = "Skibidi67TungTungSahur"
 
-  use connection <- sqlight.with_connection("sessions.db")
+  use connection <- sqlight.with_connection("database.db")
   let _ = sqlight.exec("
     CREATE TABLE IF NOT EXISTS sessions (
       uuid INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,6 +42,12 @@ pub fn main() {
       ended TEXT NOT NULL,
       entered INTEGER NOT NULL,
       exited INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS events (
+      uuid INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL,
+      time TEXT NOT NULL
     )
   ", connection)
 

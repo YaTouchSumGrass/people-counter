@@ -1,7 +1,16 @@
+import gleam/int
+import gleam/order
 import gleam/time/calendar
 import gleam/time/timestamp
 import gleam/io
-import model.{type Model, Model, type Msg, OnReceiveMessage, GotGetResponse, GotPostResponse, ArchiveSession}
+import model.{
+  type Model, Model,
+  type Msg,
+  OnReceiveMessage,
+  GotSessionGetResponse, GotSessionPostResponse,
+  GotEventGetResponse, GotEventPostResponse,
+  ArchiveSession
+}
 import gleam/option.{Some, None}
 import lustre/effect.{type Effect}
 import lustre_websocket as ws
@@ -13,7 +22,9 @@ pub fn connect_esp32() -> #(Model, Effect(Msg)) {
     Model(
       started: timestamp.from_unix_seconds(0),
       stat: None,
+      previous_stat: None,
       socket: None,
+      events: [],
       sessions: []
     ),
     ws.init("ws://192.168.4.1:80/ws", OnReceiveMessage)
@@ -30,8 +41,31 @@ pub fn sync_esp32(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         }
 
         ws.OnTextMessage(text) -> {
+          let previous_stat = model.stat
           let stat = model.decode_stat(text)
-          #(Model(..model, stat: stat), effect.none())
+
+          let effect = case previous_stat, stat {
+            Some(prev), Some(st) -> {
+              case int.compare(st.entered, prev.entered) {
+                order.Gt -> db.write_events(
+                  "Entered",
+                  timestamp.system_time()
+                  |> timestamp.to_rfc3339(calendar.utc_offset)
+                )
+                _ -> case int.compare(st.exited, prev.exited) {
+                  order.Gt -> db.write_events(
+                    "Exited",
+                    timestamp.system_time()
+                    |> timestamp.to_rfc3339(calendar.utc_offset)
+                  )
+                  _ -> effect.none()
+                }
+              }
+            }
+            _, _ -> effect.none()
+          }
+
+          #(Model(..model, stat: stat, previous_stat: previous_stat), effect)
         }
 
         ws.InvalidUrl -> {
@@ -43,7 +77,7 @@ pub fn sync_esp32(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
     }
 
-    GotGetResponse(result) -> {
+    GotSessionGetResponse(result) -> {
       case result {
         Ok(sessions) -> #(
           Model(..model, sessions: sessions),
@@ -56,13 +90,13 @@ pub fn sync_esp32(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
     }
 
-    GotPostResponse(result) -> {
+    GotSessionPostResponse(result) -> {
       case model.socket, result {
         Some(socket), Ok(response) -> {
           case response.status {
             201 -> {
               #(model, effect.batch([
-                db.fetch_data(),
+                db.fetch_sessions(),
                 ws.send(socket, "ARCHIVE")
               ]))
             }
@@ -78,10 +112,38 @@ pub fn sync_esp32(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
     }
 
+    GotEventGetResponse(result) -> {
+      case result {
+        Ok(events) -> #(
+          Model(..model, events: events),
+          effect.none()
+        )
+        Error(err) -> {
+          echo err
+          #(model, effect.none())
+        }
+      }
+    }
+
+    GotEventPostResponse(result) -> {
+      case result {
+        Ok(response) -> {
+          case response.status {
+            201 -> #(model, db.fetch_events())
+            _ -> #(model, effect.none())
+          }
+        }
+        Error(err) -> {
+          echo err
+          #(model, effect.none())
+        }
+      }
+    }
+
     ArchiveSession(ended) -> {
       case model.stat {
         Some(stat) -> {
-          #(model, db.write_data(
+          #(model, db.write_sessions(
             timestamp.to_rfc3339(model.started, calendar.utc_offset),
             timestamp.to_rfc3339(ended, calendar.utc_offset),
             stat.entered,

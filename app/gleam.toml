@@ -16,5 +16,9 @@ gleam_http = ">= 4.3.0 and < 5.0.0"
 # Remove this field to force Lustre to download its own toolchain, not your system's.
 bun = "/home/grassjelly/.bun/bin/bun"
 
+[lustre.dev.tools]
+# Remove this field to force Lustre to download its own toolchain, not your system's.
+tailwindcss = "/usr/bin/tailwindcss"
+
 [dev-dependencies]
 gleeunit = ">= 1.9.0 and < 2.0.0"

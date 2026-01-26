@@ -12,4 +12,4 @@ app/dist
 
 db/build
 db/erl_crash.dump
-db/sessions.db
+db/database.db

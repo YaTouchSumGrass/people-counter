@@ -16,8 +16,13 @@ pub type Stat {
 
 pub type Msg {
   OnReceiveMessage(ws.WebSocketEvent)
-  GotGetResponse(Result(List(Session), rsvp.Error))
-  GotPostResponse(Result(Response(String), rsvp.Error))
+
+  GotSessionGetResponse(Result(List(Session), rsvp.Error))
+  GotSessionPostResponse(Result(Response(String), rsvp.Error))
+
+  GotEventGetResponse(Result(List(SensorEvent), rsvp.Error))
+  GotEventPostResponse(Result(Response(String), rsvp.Error))
+
   ArchiveSession(Timestamp)
 }
 
@@ -25,7 +30,9 @@ pub type Model {
   Model(
     started: Timestamp,
     stat: Option(Stat),
+    previous_stat: Option(Stat),
     socket: Option(ws.WebSocket),
+    events: List(SensorEvent),
     sessions: List(Session)
   )
 }
@@ -40,6 +47,14 @@ pub type Session {
   )
 }
 
+pub type SensorEvent {
+  SensorEvent(
+    uuid: Int,
+    kind: String,
+    time: String
+  )
+}
+
 pub fn sessions_decoder() {
   decode.list({
     use uuid <- decode.field("uuid", decode.int)
@@ -48,6 +63,15 @@ pub fn sessions_decoder() {
     use entered <- decode.field("entered", decode.int)
     use exited <- decode.field("exited", decode.int)
     decode.success(Session(uuid, started, ended, entered, exited))
+  })
+}
+
+pub fn events_decoder() {
+  decode.list({
+    use uuid <- decode.field("uuid", decode.int)
+    use kind <- decode.field("kind", decode.string)
+    use time <- decode.field("time", decode.string)
+    decode.success(SensorEvent(uuid, kind, time))
   })
 }
 

@@ -9,6 +9,5 @@ export function toLocalTime(rfc3339) {
     hour: "numeric",
     minute: "numeric",
     second: "numeric",
-    timeZoneName: "short"
   });
 }

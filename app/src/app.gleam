@@ -4,9 +4,9 @@ import websocket
 import gleam/int
 import lustre
 import lustre/effect.{type Effect}
-import lustre/element/html
+import lustre/element/html.{div, h1, h2, p, text, table, th, tr, td, button}
+import lustre/attribute.{class, styles}
 import lustre/event
-import lustre/attribute
 import lustre/element.{type Element}
 import gleam/option.{Some, None}
 import model.{type Model, type Msg, ArchiveSession}
@@ -23,44 +23,69 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 }
 
 fn view(model: Model) -> Element(Msg) {
-  html.div([attribute.class("main")], [
-    html.h1([], [html.text("People Counter")]),
-    case model.socket {
-      Some(_) -> html.p([], [html.text("Board status: Connected")])
-      None -> html.p([], [html.text("Board status: Disconnected")])
-    },
-    case model.stat {
-      Some(t) -> html.div([], [
-        html.p([], [html.text("Entered:")]),
-        html.p([], [html.text(int.to_string(t.entered))]),
-        html.p([], [html.text("Exited:")]),
-        html.p([], [html.text(int.to_string(t.exited))]),
-      ])
-      None -> html.text("Waiting for data...")
-    },
-    html.button([event.on_click(ArchiveSession(timestamp.system_time()))], [html.text("Archive Session")]),
+  div([class("main")], [
+    div([class("dashboard-view")], [
+      h1([], [text("People Counter")]),
+      case model.socket {
+        Some(_) -> p([], [text("Board status: Connected")])
+        None -> p([], [text("Board status: Disconnected")])
+      },
+      case model.stat {
+        Some(t) -> html.div([], [
+          p([], [text("Entered:")]),
+          p([], [text(int.to_string(t.entered))]),
+          p([], [text("Exited:")]),
+          p([], [text(int.to_string(t.exited))]),
+        ])
+        None -> text("Waiting for data...")
+      },
+      button([event.on_click(ArchiveSession(timestamp.system_time()))], [text("Archive Session")])
+    ]),
 
-    html.div([attribute.class("db-view")], [
-      html.h2([], [html.text("Sessions")]),
+    div([class("events-view")], [
+      h2([], [text("Events")]),
+      case model.events {
+        [] -> p([], [text("There's nothing here yet!")])
+        events -> table([
+          styles([#("border-spacing", "20px 5px")])
+        ], [
+          tr([], [
+            th([], [text("ID")]),
+            th([], [text("Time")]),
+            th([], [text("Type")])
+          ]),
+          .. list.map(events, fn(event) {
+            tr([], [
+              td([], [text(int.to_string(event.uuid))]),
+              td([], [text(to_local_time(event.time))]),
+              td([], [text(event.kind)])
+            ])
+          })
+        ])
+      }
+    ]),
+
+    div([class("session-view")], [
+      h2([], [text("Sessions")]),
       case model.sessions {
-        [] -> html.p([], [html.text("There's nothing here yet!")])
-        sessions -> html.table([
-            attribute.styles([#("border-spacing", "20px 5px")])
+        [] -> p([], [text("There's nothing here yet!")])
+        sessions -> table([
+            styles([#("border-spacing", "20px 5px")])
           ], [
-          html.tr([], [
-            html.th([], [html.text("ID")]),
-            html.th([], [html.text("Started")]),
-            html.th([], [html.text("Ended")]),
-            html.th([], [html.text("Entered")]),
-           html.th([], [html.text("Exited")]),
+          tr([], [
+            th([], [text("ID")]),
+            th([], [text("Started")]),
+            th([], [text("Ended")]),
+            th([], [text("Entered")]),
+           th([], [text("Exited")]),
           ]),
           .. list.map(sessions, fn(session) {
-            html.tr([], [
-              html.td([], [html.text(int.to_string(session.uuid))]),
-              html.td([], [html.text(to_local_time(session.started))]),
-              html.td([], [html.text(to_local_time(session.ended))]),
-              html.td([], [html.text(int.to_string(session.entered))]),
-              html.td([], [html.text(int.to_string(session.exited))])
+            tr([], [
+              td([], [text(int.to_string(session.uuid))]),
+              td([], [text(to_local_time(session.started))]),
+              td([], [text(to_local_time(session.ended))]),
+              td([], [text(int.to_string(session.entered))]),
+              td([], [text(int.to_string(session.exited))])
             ])
           })
         ])
