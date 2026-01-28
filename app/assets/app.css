@@ -1,0 +1,81 @@
+body {
+  font-family: sans-serif;
+}
+
+.main {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "title title title"
+    "a     b       c";
+  height: 100vh;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.titlebar-view {
+  position: fixed;
+  grid-area: title;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  display: flex;
+  background-color: #00ccdd;
+  color: #ffffff;
+  width: 100%;
+}
+
+.titlebar-view h1 {
+  margin: 20px;
+}
+
+.archive-button {
+  background-color: #00ccdd;
+  color: #ffffff;
+  font-family: sans-serif;
+  font-size: 18px;
+  margin: 24px;
+  padding: 6px;
+  border: 0px;
+}
+
+.archive-button:hover {
+  background-color: #aaddee;
+}
+
+th {
+  position: sticky;
+  background-color: #00ccdd;
+  color: #ffffff;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 2px solid #000000;
+}
+
+.table {
+  height: 350px;
+  overflow-y: auto;
+}
+
+.dashboard-view {
+  margin-top: 75px;
+}
+
+.events-view {
+  justify-content: center;
+  align-items: center;
+  margin-top: 75px;
+}
+
+.sessions-view {
+  justify-content: center;
+  align-items: center;
+  margin-top: 75px;
+}

@@ -5,7 +5,7 @@ import gleam/int
 import lustre
 import lustre/effect.{type Effect}
 import lustre/element/html.{div, h1, h2, p, text, table, th, tr, td, button}
-import lustre/attribute.{class, styles}
+import lustre/attribute.{class, styles, rel, href}
 import lustre/event
 import lustre/element.{type Element}
 import gleam/option.{Some, None}
@@ -24,14 +24,17 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
 fn view(model: Model) -> Element(Msg) {
   div([class("main")], [
+    div([class("titlebar-view")], [
+      h1([], [text("People Counter")])
+    ]),
+
     div([class("dashboard-view")], [
-      h1([], [text("People Counter")]),
       case model.socket {
         Some(_) -> p([], [text("Board status: Connected")])
         None -> p([], [text("Board status: Disconnected")])
       },
       case model.stat {
-        Some(t) -> html.div([], [
+        Some(t) -> div([], [
           p([], [text("Entered:")]),
           p([], [text(int.to_string(t.entered))]),
           p([], [text("Exited:")]),
@@ -39,16 +42,14 @@ fn view(model: Model) -> Element(Msg) {
         ])
         None -> text("Waiting for data...")
       },
-      button([event.on_click(ArchiveSession(timestamp.system_time()))], [text("Archive Session")])
+      button([class("archive-button"), event.on_click(ArchiveSession(timestamp.system_time()))], [text("Archive Session")])
     ]),
 
     div([class("events-view")], [
       h2([], [text("Events")]),
       case model.events {
         [] -> p([], [text("There's nothing here yet!")])
-        events -> table([
-          styles([#("border-spacing", "20px 5px")])
-        ], [
+        events -> div([class("table")], [table([], [
           tr([], [
             th([], [text("ID")]),
             th([], [text("Time")]),
@@ -61,17 +62,15 @@ fn view(model: Model) -> Element(Msg) {
               td([], [text(event.kind)])
             ])
           })
-        ])
+        ])])
       }
     ]),
 
-    div([class("session-view")], [
+    div([class("sessions-view")], [
       h2([], [text("Sessions")]),
       case model.sessions {
         [] -> p([], [text("There's nothing here yet!")])
-        sessions -> table([
-            styles([#("border-spacing", "20px 5px")])
-          ], [
+        sessions -> div([class("table")], [table([], [
           tr([], [
             th([], [text("ID")]),
             th([], [text("Started")]),
@@ -88,7 +87,7 @@ fn view(model: Model) -> Element(Msg) {
               td([], [text(int.to_string(session.exited))])
             ])
           })
-        ])
+        ])])
       }
     ])
   ])
