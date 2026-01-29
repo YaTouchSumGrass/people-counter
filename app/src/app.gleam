@@ -4,8 +4,8 @@ import websocket
 import gleam/int
 import lustre
 import lustre/effect.{type Effect}
-import lustre/element/html.{div, h1, h2, p, text, table, th, tr, td, button}
-import lustre/attribute.{class, styles, rel, href}
+import lustre/element/html.{a, div, h1, h2, p, text, table, th, tr, td, button}
+import lustre/attribute.{class, href}
 import lustre/event
 import lustre/element.{type Element}
 import gleam/option.{Some, None}
@@ -25,7 +25,8 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 fn view(model: Model) -> Element(Msg) {
   div([class("main")], [
     div([class("titlebar-view")], [
-      h1([], [text("People Counter")])
+      h1([], [text("People Counter")]),
+      a([href("https://github.com/YaTouchSumGrass/people-counter")], [text("Source Code")])
     ]),
 
     div([class("dashboard-view")], [

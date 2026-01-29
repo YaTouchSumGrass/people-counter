@@ -32,7 +32,7 @@ fn cors_config() {
 
 pub fn main() {
   wisp.configure_logger()
-  let secret_key = "Skibidi67TungTungSahur"
+  let secret_key = "UseASecureSecretKey!"
 
   use connection <- sqlight.with_connection("database.db")
   let _ = sqlight.exec("

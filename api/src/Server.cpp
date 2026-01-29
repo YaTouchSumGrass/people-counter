@@ -7,7 +7,7 @@
 void setupWiFi() {
     WiFi.mode(WIFI_AP);
     // You can change the WiFi name and password here!
-    WiFi.softAP("ESP32_PeopleCounter", "Skibidi67TungTungSahur");
+    WiFi.softAP("ESP32_PeopleCounter", "UseASecurePassword!");
 }
 
 extern Stat globalStat;

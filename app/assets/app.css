@@ -31,6 +31,18 @@ body {
   margin: 20px;
 }
 
+.titlebar-view a {
+  position: absolute;
+  color: #ffffff;
+  text-decoration: none;
+  margin: 20px;
+  right: 20px;
+}
+
+.titlebar-view a:hover {
+  text-decoration: underline;
+}
+
 .archive-button {
   background-color: #00ccdd;
   color: #ffffff;
